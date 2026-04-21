@@ -1,0 +1,21 @@
+[theme]
+# RBI Theme Colors
+primaryColor = "#d69e2e"  # Golden accent (from RBI logo colors)
+backgroundColor = "#f7fafc"  # Light gray background
+secondaryBackgroundColor = "#ffffff"  # White for cards
+textColor = "#2d3748"  # Dark gray text
+font = "sans-serif"
+
+[server]
+headless = true
+enableCORS = true
+enableXsrfProtection = true
+
+[browser]
+gatherUsageStats = false
+
+[logger]
+level = "info"
+
+[runner]
+fastReruns = true
