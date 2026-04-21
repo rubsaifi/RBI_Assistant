@@ -290,13 +290,8 @@ RULES:
 2. If info not in context, say: "Information not found in document."
 3. Keep answers under 100 tokens - be direct
 4. Use bullet points for lists
-5. After answering, suggest 2-3 related follow-up questions
-6. Predict 1 likely next query the user might ask
 
-Format your response EXACTLY as:
-ANSWER: <your concise answer here>
-FOLLOW_UPS: <question1>, <question2>, <question3>
-PREDICTED: <most likely next question>"""
+Give a natural, conversational response without any prefixes or labels."""
         )
 
     if "rag_engine" not in st.session_state:
