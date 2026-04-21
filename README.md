@@ -6,6 +6,7 @@ An AI-powered chatbot built with Python and Streamlit that helps users resolve q
 
 - 🤖 **AI-Powered Q&A**: Ask questions about RBI policies and get accurate answers
 - 📚 **RAG-Based**: Uses Retrieval-Augmented Generation for precise responses
+- 💬 **Unlimited Queries**: Smart conversation management prevents token limits
 - 🎨 **Themed UI**: Professional RBI-themed interface with custom colors
 - ⚡ **Fast Responses**: Optimized for quick inference using Groq API
 - 🔒 **Privacy Focused**: No data stored, all queries processed in real-time
@@ -119,16 +120,7 @@ git push -u origin main
 
 ### Step 3: Share Your App
 - App URL: `https://your-app-name.streamlit.app`
-- 🎤 Voice input works in Chrome/Edge browsers
-
-## 🎤 Voice Input Feature
-
-The app includes voice-to-text functionality using the Web Speech API:
-
-- Click the 🎤 button to start speaking
-- Click again to stop
-- Works best in **Google Chrome** or **Microsoft Edge**
-- Your speech is converted to text automatically
+- The app will be publicly accessible (or private based on your settings)
 
 ## 🎨 Theme Customization
 
