@@ -99,22 +99,37 @@ class GroqProvider(LLMProvider):
         if not self.api_key:
             return "❌ GROQ_API_KEY missing in .env"
 
-        try:
-            res = requests.post(
-                self.url,
-                headers={"Authorization": f"Bearer {self.api_key}"},
-                json={
-                    "model": self.model,
-                    "messages": messages,
-                    "temperature": 0.1,
-                    "max_tokens": max_tokens
-                },
-                timeout=30
-            )
-            res.raise_for_status()
-            return res.json()["choices"][0]["message"]["content"]
-        except Exception as e:
-            return f"❌ Groq Error: {str(e)}"
+        import time
+        max_retries = 3
+        retry_delay = 2
+
+        for attempt in range(max_retries):
+            try:
+                res = requests.post(
+                    self.url,
+                    headers={"Authorization": f"Bearer {self.api_key}"},
+                    json={
+                        "model": self.model,
+                        "messages": messages,
+                        "temperature": 0.1,
+                        "max_tokens": max_tokens
+                    },
+                    timeout=60
+                )
+                res.raise_for_status()
+                return res.json()["choices"][0]["message"]["content"]
+            except requests.exceptions.ConnectionError as e:
+                if attempt < max_retries - 1:
+                    time.sleep(retry_delay)
+                    continue
+                return f"❌ Groq Error: Connection reset. Please try again."
+            except requests.exceptions.Timeout as e:
+                if attempt < max_retries - 1:
+                    time.sleep(retry_delay)
+                    continue
+                return f"❌ Groq Error: Request timed out. Please try again."
+            except Exception as e:
+                return f"❌ Groq Error: {str(e)}"
 
 
 class HuggingFaceProvider(LLMProvider):
@@ -196,7 +211,8 @@ def get_llm_response(
 
     system_prompt = """You are an RBI policy expert.
 Answer ONLY from given context.
-Keep answers short and precise."""
+Keep answers short and precise.
+IMPORTANT: If the context is insufficient or doesn't contain relevant information to answer the question, respond with: 'Information not found in document.'"""
 
     if conversation_manager is None:
         conversation_manager = ConversationManager(system_prompt=system_prompt)
@@ -206,6 +222,10 @@ Keep answers short and precise."""
     messages = conversation_manager.get_context_window(question, context)
 
     response = llm.generate_response(messages)
+
+    # Check if context was insufficient
+    if context == "INSUFFICIENT_CONTEXT":
+        response = "Information not found in document."
 
     # Save history
     conversation_manager.add_message("user", question)

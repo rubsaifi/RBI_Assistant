@@ -30,13 +30,13 @@ def clean_text(text: str) -> str:
     return text.strip()
 
 
-def chunk_text(text: str, chunk_size: int = 1000, overlap: int = 200) -> List[str]:
+def chunk_text(text: str, chunk_size: int = 1500, overlap: int = 300) -> List[str]:
     """
     Split text into overlapping chunks for better retrieval.
 
     Args:
         text: The text to split
-        chunk_size: Size of each chunk
+        chunk_size: Size of each chunk (increased to keep definitions intact)
         overlap: Overlap between chunks
 
     Returns:
@@ -50,9 +50,15 @@ def chunk_text(text: str, chunk_size: int = 1000, overlap: int = 200) -> List[st
         # Try to end at a sentence boundary
         if end < len(text):
             # Look for sentence endings
-            sentence_end = text.rfind('.', end - 100, end)
-            if sentence_end != -1:
+            sentence_end = text.rfind('.', end - 150, end)
+            if sentence_end != -1 and sentence_end > start + 300:
                 end = sentence_end + 1
+            else:
+                # Also try to avoid splitting numbered lists and definitions
+                # Look for paragraph breaks (double newline)
+                para_end = text.rfind('\n\n', end - 200, end)
+                if para_end != -1 and para_end > start + 300:
+                    end = para_end
 
         chunk = text[start:end].strip()
         if chunk:

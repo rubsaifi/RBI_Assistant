@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c ' *)",
+      "Bash(pip list *)",
+      "Bash(pip3 list *)"
+    ]
+  }
+}

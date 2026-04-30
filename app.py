@@ -428,14 +428,37 @@ def process_user_question(question: str):
     with st.spinner("🏛️ Analyzing RBI Master Circular..."):
         try:
             if st.session_state.rag_engine:
-                context = st.session_state.rag_engine.get_relevant_context(question)
+                # Detect definition-type queries that need keyword boost
+                query_lower = question.lower()
 
-                # Use conversation manager for unlimited queries
-                response_data = get_llm_response(
-                    question=question,
-                    context=context,
-                    conversation_manager=st.session_state.conversation_manager
-                )
+                if any(kw in query_lower for kw in ['ovd', 'officially valid', 'types of', 'what are the types']):
+                    context = st.session_state.rag_engine.get_definition_context(
+                        question,
+                        keywords=['passport', 'driving licence', 'aadhaar', 'voter', 'job card', 'national population register', 'officially valid document']
+                    )
+                else:
+                    context = st.session_state.rag_engine.get_relevant_context(question)
+
+                # Check if context is sufficient
+                if context == "INSUFFICIENT_CONTEXT":
+                    response_data = {
+                        "answer": "Information not found in document. This document appears to be an RBI KYC Master Circular for commercial banks. Your question relates to topics that may not be covered in this document.",
+                        "suggested_questions": [
+                            "What is KYC?",
+                            "What are the types of officially valid documents?",
+                            "What is the CDD procedure for banks?",
+                            "Who is a beneficial owner?"
+                        ],
+                        "predicted_query": "",
+                        "query_count": st.session_state.conversation_manager.query_count
+                    }
+                else:
+                    # Use conversation manager for unlimited queries
+                    response_data = get_llm_response(
+                        question=question,
+                        context=context,
+                        conversation_manager=st.session_state.conversation_manager
+                    )
             else:
                 response_data = {
                     "answer": "❌ Document not loaded. Please check the PDF file.",
